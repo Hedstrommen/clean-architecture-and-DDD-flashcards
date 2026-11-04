@@ -50,9 +50,20 @@ npm run build
 
 ## Deployment
 
-During development the app is deployed to **GitHub Pages** via the
-[deploy workflow](.github/workflows/deploy-pages.yml) on every push to `main`
-(`npm run build` with `GITHUB_PAGES=true` sets the correct base path).
+The app is deployed to **GitHub Pages** by the
+[pages workflow](.github/workflows/pages.yml), which assembles one site with two entry points:
+
+- **Public app** (built from `main`, served at the site root):
+  `https://hedstrommen.github.io/clean-architecture-and-DDD-flashcards/`
+- **Draft preview** (built from the active `vibe/*` branch, served at an unlisted path):
+  `https://hedstrommen.github.io/clean-architecture-and-DDD-flashcards/draft/`
+
+The draft URL is never linked from the public app and shows a "draft preview" banner, so only
+people who know the URL can find it. Note that the repository is public, so GitHub Pages cannot
+enforce a login — the draft is unlisted, not access-controlled.
+
+The build base path is set via the `PAGES_BASE` environment variable; the draft build also sets
+`VITE_DEPLOY_TARGET=draft` to enable the banner.
 
 The architecture (framework-agnostic domain core, ports & adapters) is kept free of web-specific
 APIs so the same core can later be shipped to the **Play Store** by wrapping the web build with
