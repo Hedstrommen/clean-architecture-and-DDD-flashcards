@@ -1,0 +1,63 @@
+name: Deploy Pages (public + draft)
+
+on:
+  push:
+    branches: [main, 'vibe/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  REPO_PATH: /clean-architecture-and-DDD-flashcards/
+  FALLBACK_DRAFT_BRANCH: vibe/starting-draft-fda737
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: public
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ startsWith(github.ref, 'refs/heads/vibe/') && github.ref_name || env.FALLBACK_DRAFT_BRANCH }}
+          path: draft
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install and build public app
+        working-directory: public
+        run: |
+          npm ci
+          PAGES_BASE=${{ env.REPO_PATH }} VITE_DEPLOY_TARGET=public npm run build
+      - name: Install and build draft app
+        working-directory: draft
+        run: |
+          npm ci
+          PAGES_BASE=${{ env.REPO_PATH }}draft/ VITE_DEPLOY_TARGET=draft npm run build
+      - name: Assemble site
+        run: |
+          mkdir -p dist/draft
+          cp -r public/dist/. dist/
+          cp -r draft/dist/. dist/draft/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
