@@ -4,8 +4,13 @@ import { SessionPage } from './presentation/pages/SessionPage.tsx';
 import { ReferencePage } from './presentation/pages/ReferencePage.tsx';
 import { Legend } from './presentation/components/Legend.tsx';
 
+const isDraftDeployment = import.meta.env.VITE_DEPLOY_TARGET === 'draft';
+
 export const App = () => (
   <HashRouter>
+    {isDraftDeployment && (
+      <div className="draft-banner">Draft preview — not the public app</div>
+    )}
     <div className="container">
       <header className="app-header">
         <h1>

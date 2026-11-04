@@ -322,3 +322,16 @@ a { color: var(--ca); }
 }
 
 .empty-state { color: var(--ink-soft); font-style: italic; padding: 24px 0; }
+
+.draft-banner {
+  background: #b45309;
+  color: #fff;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
